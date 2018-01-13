@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+
+    <link rel="icon" type="image/svg" href="../res/logo.svg" />
+    <title>How's the Movie</title>
+    <link href="bootstrap.min.css" rel="stylesheet" />
+    <link href="material-dashboard.css" rel="stylesheet" />
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons"/>
+    <style>
+        .credit-summary-item, .movie-detail-item{
+            padding : 3px;
+        }
+        .movie-title{
+            font-weight: bold;
+            font-size: 22pt;
+        }
+        .credit-header, .movie-detail-header, .sentiment-info-header{
+            font-weight: bold;
+        }
+        .sentiment-value, .sentiment-info-value{
+            font-size: 15pt;
+        }
+        .positive-sentiment{
+            color: GREEN;
+        }
+        .negative-sentiment{
+            color: ORANGE;
+        }
+        .movie-poster{
+            max-height: 100%;
+            max-width: auto;
+        }
+        .movie-poster img{
+            max-height: 600px;
+            max-width: auto;
+            width: 50%;
+            height: auto;
+            display: block;
+            margin: 5% 25%;
+
+        }
+        .result{
+            display: none;
+            padding-top: 25px;
+        }
+        .loading{
+            display:none;
+            border-radius: 50% !important ;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto;
+            margin-left: 30%;
+        }
+        .loading-content{
+            height: 10%;
+            width: auto;
+            padding-top: 40%;
+            display: block;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .loading-content img{
+            width: auto;
+            height: auto ;
+            max-width: 100px;
+            max-height: 100px;
+            margin: 0 auto;
+            display: block;
+            padding-bottom: 10px;
+        }
+        .sentiment-result-header{
+            text-align: center;
+            text-overflow: clip;
+            text-decoration: underline;
+            font-size: 12pt;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="sidebar" data-active-color="rose" data-background-color="black" data-image="../res/sidebar-image.jpeg" > 
+            <div class="logo">
+                <a href="index.html" class="simple-text">
+                How's the Movie
+                </a>
+            </div>
+            <div class="logo logo-mini">
+                    <img src="../res/logo.svg" width="50px"  height="50" style="margin: 0 10px; "/>
+            </div>
+            <div class="sidebar-wrapper">
+                <ul class="nav">
+                    <li>
+                        <a href="index.html">
+                            <i class="material-icons">search</i>
+                            <p>Search</p>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/it-worked-yesterday/HowsTheMovie-FrontEnd" target="_blank">
+                            <i class="material-icons">settings</i>
+                            <p>Git</p>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="main-panel">
+            <nav class="navbar navbar-transparent navbar-absolute">
+                <div class="container-fluid">
+                    <div class="navbar-minimize">
+                        <button id="minimizeSidebar" class="btn btn-round btn-white btn-fill btn-just-icon">
+                            <i class="material-icons visible-on-sidebar-regular">more_vert</i>
+                            <i class="material-icons visible-on-sidebar-mini">view_list</i>
+                        </button>
+                    </div>
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="card">
+                                <form id="Search" class="form-horizontal" onsubmit="return false">
+                                    <div class="card-content">
+                                        <div class="row">
+                                            <label class="col-sm-1 label-on-left"></label>
+                                            <div class="col-sm-10">
+                                                <div class="form-group label-floating is-empty">
+                                                    <label class="control-label"></label>
+                                                    <input type="text" class="form-control" name="query" 
+                                                            placeholder="Enter Movie or TV series name"
+                                                            required oninvalid="this.setCustomValidity('You can\'t search without query, can you?')"
+                                                        oninput="setCustomValidity('')">
+                                                </div>
+                                                <div class="form-group label-floating is-empty">
+                                                    <button  type="submit" class="btn btn-success">Search</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class ="card col-md-12 loading">
+                                <div class="loading-content">
+                                    <div>
+                                        <img id= "loader_img" src="../res/Loader1.gif" >
+                                    </div>
+                                    <div id="loading-text" >
+                                        .Loading.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class=" result card col-md-12">
+                                <div class="card-content" >
+                                    <div class="row">
+                                        <div class="col-md-6" >
+                                            <div class="header movie-title">
+                                                Movie Name
+                                            </div>
+                                            <div id = "director" class="credit-summary-item">
+                                                <div>
+                                                    <span class="credit-header">
+                                                        Directed By:
+                                                    </span>
+                                                    <span class="credit-detail">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="credit-summary-item">
+                                                <div>
+                                                    <span class="credit-header">
+                                                        Cast:
+                                                    </span>
+                                                    <span class="credit-detail">
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <hr />
+                                                <div class="movie-detail-item">
+                                                    <span class="movie-detail-header">
+                                                        Movie Rating:
+                                                    </span>
+                                                    <span class="movie-detail-content">
+                                                    </span>
+                                                </div>
+                                                <div class="movie-detail-item">
+                                                    <span class="movie-detail-header">
+                                                        Rated By:
+                                                    </span>
+                                                    <span class="movie-detail-content">
+                                                    </span>
+                                                </div>
+                                                <hr/>
+                                                <div class="sentiment-result">
+                                                    <div class="sentiment-result-header">
+                                                         <p>TWITTER SENTIMENT ANALYSIS</p>
+                                                    </div>
+                                                    <div class="movie-detail-item">
+                                                         <span class="movie-detail-header sentiment-header positive-sentiment">
+                                                            Positive Reviews:
+                                                        </span>
+                                                        <span id="positive-reviews" class="movie-detail-content sentiment-value positive-sentiment">
+                                                        </span>
+                                                    </div>
+                                                    <div class="movie-detail-item">
+                                                        <span class="movie-detail-header sentiment-header negative-sentiment">
+                                                            Negtive Reviews:
+                                                        </span>
+                                                        <span id="negative-reviews" class="movie-detail-content sentiment-value negative-sentiment">
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class = "col-md-6">
+                                            <div id ="movie_poster" itemprop = "Poster" class="movie-poster">
+                                                <img src="https://images-na.ssl-images-amazon.com/images/M/MV5BZTEyMTlmYTUtMDE0My00NWJmLWJlZmEtNzhjNGI0Mzk0NTA4XkEyXkFqcGdeQXVyNTkzNDQ4ODc@._V1_UY268_CR9,0,182,268_AL__QL50.jpg"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="divider" style="position: relative; border-bottom: 1px solid #f0f0f0; margin-bottom: 30px; margin-top: 30px; "></div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<!--   Core JS Files   -->
+<script src="jquery-3.1.1.min.js" type="text/javascript"></script>
+<script src="jquery-ui.min.js"></script>
+<script src="bootstrap.min.js" type="text/javascript"></script>
+<script src="material.min.js" type="text/javascript"></script>
+<script src="perfect-scrollbar.jquery.min.js" type="text/javascript"></script>
+<script src="material-dashboard.js"></script>
+
+<!-- Custom JS Files-->
+<script src="howsthemovie.js" type="text/javascript"></script>
+
+
+</html>
